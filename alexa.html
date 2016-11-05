@@ -1,0 +1,79 @@
+<script type="text/x-red" data-template-name="alexa-home-conf">
+<div class="form-row">
+	    <label for="node-input-username"><i class="icon-tag"></i> Username</label>
+	    <input type="text" id="node-input-username">
+	</div>
+	<div class="form-row">
+	   	<label for="node-input-password"><i class="icon-tag"></i> Password</label>
+	    <input type="password" id="node-input-password">
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="alexa-home-conf">
+	<p><a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/">here</a></p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('alexa-home-conf',{
+        category: 'config',
+        defaults: {
+        	name: {}
+        },
+        color: 'gray',
+        label: function() {
+        	return this.name;
+        },
+        oneditsave: function(){
+        	var node = this;
+        	var username = $('#node-input-username').val();
+        	var password = $('#node-input-password').val();
+        	this.name = username;
+        	var account = {
+        		id: node.id,
+        		user: username,
+        		pass: password
+        	}
+        	$.post('alexa-home/new-account',account);
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="alexa-home">
+	<div class="form-row">
+		<label for="node-input-conf"><i class="icon-tag"></i> Accout</label>
+		<input type="text" id="node-input-conf">
+	</div>
+	<div class="form-row">
+		<label for="node-input-device"><i class="icon-tag"></i> Device</label>
+		<select id="node-input-device">
+			
+		</select>
+	</div>
+</script>
+
+<script type="text/x-red" data-help-name="alexa-home">
+	<p><a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/">here</a></p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('alexa-home',{
+        category: 'input',
+        defaults: {
+        	conf: {value: "", type:"alexa-home-conf"},
+        	device: {value: "" },
+        	name: {}
+        },
+        outputs: 1,
+        inputs: 0,
+        color: 'gray',
+        label: function() {
+        	return this.name || "Alexa Home";
+        },
+        oneditprepare: function(){
+        	var node = this;
+        	if (node.conf) {
+        		console.log($('#node-input-conf').val());
+        	}
+        }
+    });
+</script>
