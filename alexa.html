@@ -1,5 +1,17 @@
+<!--
+  Copyright 2016 IBM Corp.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <script type="text/x-red" data-template-name="alexa-home-conf">
-<div class="form-row">
+    <div class="form-row">
 	    <label for="node-input-username"><i class="icon-tag"></i> Username</label>
 	    <input type="text" id="node-input-username">
 	</div>
@@ -19,21 +31,43 @@
         defaults: {
         	name: {}
         },
+        credentials: {
+        	username: {type:'text'},
+        	password: {type: 'password'}
+        },
         color: 'gray',
         label: function() {
         	return this.name;
+        },
+        oneditprepare: function(){
+        	var node = this;
+        	var username = node.name;
+        	if (node.credentials.has_password) {
+        		$('#node-input-password').val("__PWD__");	
+        	}
+        	$('#node-input-username').val(username);
         },
         oneditsave: function(){
         	var node = this;
         	var username = $('#node-input-username').val();
         	var password = $('#node-input-password').val();
-        	this.name = username;
-        	var account = {
-        		id: node.id,
-        		user: username,
-        		pass: password
+        	node.name = username;
+        	node.credentials.username = username;
+        	if (password != '__PWD__') {
+        	   node.credentials.password = password;
+        		var account = {
+        			id: node.id,
+        			user: username,
+        			pass: password
+        		}
+        		$.ajax({
+        			data: JSON.stringify(account),
+        			url: 'alexa-home/new-account',
+        			contentType: 'application/json',
+        			type: 'POST',
+        			processData: false
+        		});
         	}
-        	$.post('alexa-home/new-account',account);
         }
     });
 </script>
@@ -49,6 +83,11 @@
 			
 		</select>
 	</div>
+    <div class="form-row">
+        <label for="node-input-topic"><i class="icon-tag"></i> Topic</label>
+        <input type="text" id="node-input-topic">
+    </div>
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="alexa-home">
@@ -61,19 +100,53 @@
         defaults: {
         	conf: {value: "", type:"alexa-home-conf"},
         	device: {value: "" },
-        	name: {}
+        	name: {},
+            topic: {}
         },
         outputs: 1,
         inputs: 0,
         color: 'gray',
+        icon: 'alexa.png',
         label: function() {
         	return this.name || "Alexa Home";
+        },
+        oneditsave: function() {
         },
         oneditprepare: function(){
         	var node = this;
         	if (node.conf) {
-        		console.log($('#node-input-conf').val());
+        		var account = $('#node-input-conf').val();
+        		if (account != '_ADD_') {
+	        		$.getJSON('alexa-home/devices/' + accout, function(data){
+	        			$('#node-input-device').find('option').remove().end();
+	        			for (d in data) {
+	        				$('<option/>',{
+								value: parseInt(data[d].applianceId),
+								text: data[d].friendlyName
+							}).appendTo('#node-input-device');
+	        			}
+	        		});
+	        		if (node.device) {
+	        			$('#node-input-conf').val(node.device);
+	        		}
+        		}
         	}
+
+        	$('#node-input-conf').change(function(){
+        		var account = $('#node-input-conf').val();
+        		$.getJSON('alexa-home/devices/' + account, function(data){
+        			$('#node-input-device').find('option').remove().end();
+        			for (d in data) {
+        				$('<option/>',{
+							value: parseInt(data[d].applianceId),
+							text: data[d].friendlyName
+						}).appendTo('#node-input-device');
+        			}
+        		});
+        		if (node.device) {
+        			$('#node-input-conf').val(node.device);
+        		}
+        	})
         }
     });
 </script>

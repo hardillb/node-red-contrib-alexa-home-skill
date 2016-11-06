@@ -19,6 +19,7 @@
   "author": "hardillb@gmail.com",
   "license": "Apache-2.0",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "mqtt": "^2.0.1",
     "request": "^2.78.0"
   }
