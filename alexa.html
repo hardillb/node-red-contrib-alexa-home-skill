@@ -87,6 +87,17 @@
     You will also need to add the "Node-RED" skill to your Echo device</p>
     <p>A full set of setup instrucations can be found 
     <a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/docs">here</a></p>
+    <p>The node outputs a message with a payload that looks something like this:</p>
+    <pre>{
+    "command": "TurnOnRequest",
+    "extraInfo": {}
+}</pre>
+    <p>or</p>
+    <pre>{
+    "command": "SetPercentageRequest",
+    "extraInfo": {}, 
+    "value": 50
+}</pre>
 </script>
 
 <script type="text/javascript">
@@ -105,11 +116,14 @@
         label: function() {
         	return this.name || "Alexa Home";
         },
+        oneditsave: function() {
+            this.name = $('#node-input-device option:selected').text();
+        },
         oneditprepare: function(){
         	var node = this;
         	if (node.conf) {
         		var account = $('#node-input-conf').val();
-                console.log("account: ", account);
+                //console.log("account: ", account);
         		if (account != '_ADD_') {
 	        		$.getJSON('alexa-home/devices/' + account, function(data){
 	        			$('#node-input-device').find('option').remove().end();
@@ -130,7 +144,7 @@
 
         	$('#node-input-conf').change(function(){
         		var account = $('#node-input-conf').val();
-                console.log("account changed: ", account);
+                //console.log("account changed: ", account);
                 if (account != '_ADD_') {
             		$.getJSON('alexa-home/devices/' + account, function(data){
             			$('#node-input-device').find('option').remove().end();
@@ -147,7 +161,7 @@
             			$('#node-input-device').val(node.device);
             		}
                 } else {
-                    console.log("new account");
+                    //console.log("new account");
                     $('#node-input-device').find('option').remove().end();
                     $('#node-input-device').val("");
                 }

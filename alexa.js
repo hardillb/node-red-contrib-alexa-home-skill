@@ -94,7 +94,7 @@ module.exports = function(RED) {
                     break;
                 case "IncrementPercentageRequest":
                 case "DecrementPercentageRequest":
-                    msg.payload.value = message.payload.deltaPercentage;
+                    msg.payload.value = message.payload.deltaPercentage.value;
                     break;
                 case "SetTargetTemperatureRequest":
                     msg.payload.value = message.payload.targetTemperature.value;
