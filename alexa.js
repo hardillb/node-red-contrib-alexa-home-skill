@@ -52,8 +52,8 @@ module.exports = function(RED) {
         });
 
         node.client.on('message', function(topic, message){
-            console.log(topic);
-            console.log(message.toString());
+            //console.log(topic);
+            //console.log(message.toString());
             var msg = JSON.parse(message.toString()); 
             node.emit('alexa'+msg.payload.appliance.applianceId, msg);
         });
