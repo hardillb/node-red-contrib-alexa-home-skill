@@ -47,12 +47,12 @@ module.exports = function(RED) {
             console.log(topic);
             console.log(message.toString());
             var msg = JSON.parse(message.toString()); 
-            node.emit(''+msg.payload.appliance.applianceId,msg);
+            node.emit('alexa'+msg.payload.appliance.applianceId,msg);
         });
 
     	this.on('close',function(){
             node.client.end();
-            node.removeAllListeners();
+            //node.removeAllListeners();
     		delete devices[node.id];
     	});
     };
@@ -72,13 +72,35 @@ module.exports = function(RED) {
     	var node = this;
 
         function msgHandler(message){
-            node.send({
+            var msg ={
                 topic: node.topic || "",
-                payload: message.header.name
-            });
+                payload: {
+                    command: message.header.name
+                    extraInfo: message.payload.appliance.additionalApplianceDetails
+                }
+            }
+
+            switch(message.header.name){
+                case "SetPercentageRequest":
+                    msg.payload.value = message.payload.percentageState;
+                    break;
+                case "IncrementPercentageRequest":
+                case "DecrementPercentageRequest":
+                    msg.payload.value = message.payload.deltaPercentage;
+                    break;
+                case "SetTargetTemperatureRequest":
+                    msg.payload.value = message.payload.targetTemperature.value;
+                    break;
+                case "IncrementTargetTemperatureRequest":
+                case "DecrementTargetTemperatureRequest":
+                    msg.payload.value = message.payload.deltaTemperature.value;
+                    break;
+            }
+
+            node.send(msg);
         }
 
-        node.conf.on(''+node.device, msgHandler);
+        node.conf.on('alexa'+node.device, msgHandler);
 
         node.on('close', function(){
             node.conf.removeListener(''+node.device,msgHandler);
