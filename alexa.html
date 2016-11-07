@@ -22,7 +22,8 @@
 </script>
 
 <script type="text/x-red" data-help-name="alexa-home-conf">
-	<p><a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/">here</a></p>
+	<p>If you don't have an account on the bridge create one 
+    <a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/">here</a></p>
 </script>
 
 <script type="text/javascript">
@@ -80,12 +81,17 @@
 </script>
 
 <script type="text/x-red" data-help-name="alexa-home">
-	<p><a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/">here</a></p>
+	<p>This node provides an end point for an Alexa Home Skill.
+    To use this node you will need to create an account and declare some devices 
+    <a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/">here</a>. 
+    You will also need to add the "Node-RED" skill to your Echo device</p>
+    <p>A full set of setup instrucations can be found 
+    <a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/docs">here</a></p>
 </script>
 
 <script type="text/javascript">
     RED.nodes.registerType('alexa-home',{
-        category: 'input',
+        category: 'alexa',
         defaults: {
         	conf: {value: "", type:"alexa-home-conf"},
         	device: {value: "" },

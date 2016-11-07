@@ -31,23 +31,31 @@ module.exports = function(RED) {
 
         var options = {
             username: node.username,
-            password: node.password,
+            password: node.password
         };
 
-        getDevices(node.username, node.password,node.id);
+        getDevices(node.username, node.password, node.id);
 
         node.client = mqtt.connect('mqtt://134.168.37.62', options);
 
-        node.client.on('connect', function(){
-            console.log("connected");
+        node.client.on('connect', function() {
+            node.emit('status',{text:'connected', shape:'dot', fill:'green'});
             node.client.subscribe(node.username + '/#');
+        });
+
+        node.client.on('offline',function(){
+            node.emit('status',{text: 'disconnected', shape: 'dot', fill:'red'});
+        });
+
+        node.client.on('reconnect', function(){
+            node.emit('status',{text: 'reconnecting', shape: 'ring', fill:'red'});
         });
 
         node.client.on('message', function(topic, message){
             console.log(topic);
             console.log(message.toString());
             var msg = JSON.parse(message.toString()); 
-            node.emit('alexa'+msg.payload.appliance.applianceId,msg);
+            node.emit('alexa'+msg.payload.appliance.applianceId, msg);
         });
 
     	this.on('close',function(){
@@ -75,7 +83,7 @@ module.exports = function(RED) {
             var msg ={
                 topic: node.topic || "",
                 payload: {
-                    command: message.header.name
+                    command: message.header.name,
                     extraInfo: message.payload.appliance.additionalApplianceDetails
                 }
             }
@@ -101,6 +109,10 @@ module.exports = function(RED) {
         }
 
         node.conf.on('alexa'+node.device, msgHandler);
+
+        node.conf.on('status',function(status){
+            node.status(status);
+        });
 
         node.on('close', function(){
             node.conf.removeListener(''+node.device,msgHandler);
