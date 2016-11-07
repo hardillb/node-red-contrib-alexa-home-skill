@@ -22,15 +22,10 @@ module.exports = function(RED) {
 
     var devices = {};
 
-    function conf(n) {
+    function alexaConf(n) {
     	RED.nodes.createNode(this,n);
-    	this.username = this.credentials.username;
+    	this.username = n.username;
     	this.password = this.credentials.password;
-
-        console.log(this.credentials);
-
-        console.log(this.username);
-        console.log(this.password);
 
     	var node = this;
 
@@ -39,29 +34,33 @@ module.exports = function(RED) {
             password: node.password,
         };
 
-        //node.client = mqtt.connect('mqtt://134.168.37.62', options);
+        getDevices(node.username, node.password,node.id);
 
-        // node.client.on('connect', function(){
-        //     node.client.subscribe(node.username + '/#')
-        // });
+        node.client = mqtt.connect('mqtt://134.168.37.62', options);
 
-        // node.client.on('message', function(topic, message){
-        //     console.log(topic);
-        //     console.log(message.toString);
-        //     node.emit('',)
-        // });
+        node.client.on('connect', function(){
+            console.log("connected");
+            node.client.subscribe(node.username + '/#');
+        });
+
+        node.client.on('message', function(topic, message){
+            console.log(topic);
+            console.log(message.toString());
+            var msg = JSON.parse(message.toString()); 
+            node.emit(''+msg.payload.appliance.applianceId,msg);
+        });
 
     	this.on('close',function(){
-            // node.client.end();
-    		delete devices[username];
+            node.client.end();
+            node.removeAllListeners();
+    		delete devices[node.id];
     	});
     };
 
-    RED.nodes.registerType("alexa-home-conf", conf, {
-    	credentials: {
-    		username: {type: "text"},
-    		password: {type: "password"}
-    	}
+    RED.nodes.registerType("alexa-home-conf",alexaConf,{
+        credentials: {
+            password: {type:"password"}
+        }
     });
 
     function alexaHome(n) {
@@ -75,7 +74,7 @@ module.exports = function(RED) {
         function msgHandler(message){
             node.send({
                 topic: node.topic || "",
-                payload: message
+                payload: message.header.name
             });
         }
 
@@ -92,28 +91,32 @@ module.exports = function(RED) {
 
     RED.httpAdmin.use('/alexa-home/new-account',bodyParser.json());
 
+    function getDevices(username, password, id){
+        if (username && password) {
+            request.get({
+                url: 'https://alexa-node-red.eu-gb.mybluemix.net/api/v1/devices',
+                auth: {
+                    username: username,
+                    password: password
+                }
+            }, function(err, res, body){
+                if (!err) {
+                    var devs = JSON.parse(body);
+                    //console.log(devs);
+                    devices[id] = devs;
+                } else {
+                    console.log("err: ",err);
+                }
+            });
+        }
+    };
+
     RED.httpAdmin.post('/alexa-home/new-account',function(req,res){
     	console.log(req.body);
     	var username = req.body.user;
     	var password = req.body.pass;
     	var id = req.body.id;
-    	if (username && password) {
-	    	request.get({
-	    		url: 'https://alexa-node-red.eu-gb.mybluemix.net/api/v1/devices',
-	    		auth: {
-	    			username: username,
-	    			password: password
-	    		}
-	    	}, function(err, res, body){
-	    		if (!err) {
-	    			var devs = JSON.parse(body);
-	    			//console.log(devs);
-	    			devices[id] = devs;
-	    		} else {
-	    			console.log(err);
-	    		}
-	    	});
-    	}
+    	getDevices(username,password,id);
     });
 
     RED.httpAdmin.get('/alexa-home/devices/:id',function(req,res){
