@@ -70,8 +70,9 @@
 	<div class="form-row">
 		<label for="node-input-device"><i class="icon-tag"></i> Device</label>
 		<select id="node-input-device">
-			
+		
 		</select>
+        <a id="node-input-device-refresh" class="btn"><i class="fa fa-refresh"></i></a>
 	</div>
     <div class="form-row">
         <label for="node-input-topic"><i class="icon-tag"></i> Topic</label>
@@ -98,6 +99,17 @@
     "extraInfo": {}, 
     "value": 50
 }</pre>
+    <p>This is a full list of the currently valid commands:</p>
+    <ul>
+        <li>TurnOnRequest</li>
+        <li>TurnOffRequest</li>
+        <li>SetPercentageRequest</li>
+        <li>IncrementPercentageRequest</li>
+        <li>DecrementPercentageRequest</li>
+        <li>SetTemperatureRequest</li>
+        <li>IncrementTemperatureRequest</li>
+        <li>DecrementTemperatureRequest</li>
+    </ul>
 </script>
 
 <script type="text/javascript">
@@ -121,24 +133,29 @@
         },
         oneditprepare: function(){
         	var node = this;
+
+            var getDevs = function (account){
+                $.getJSON('alexa-home/devices/' + account, function(data){
+                    $('#node-input-device').find('option').remove().end();
+                    for (d in data) {
+                        $('<option/>',{
+                        value: parseInt(data[d].applianceId),
+                            text: data[d].friendlyName
+                        }).appendTo('#node-input-device');
+                    }
+                }).fail(function(){
+                    console.log("problem getting devices");
+                });
+                if (node.device) {
+                    $('#node-input-device').val(node.device);
+                }
+            }
+
         	if (node.conf) {
         		var account = $('#node-input-conf').val();
                 //console.log("account: ", account);
         		if (account != '_ADD_') {
-	        		$.getJSON('alexa-home/devices/' + account, function(data){
-	        			$('#node-input-device').find('option').remove().end();
-	        			for (d in data) {
-	        				$('<option/>',{
-								value: parseInt(data[d].applianceId),
-								text: data[d].friendlyName
-							}).appendTo('#node-input-device');
-	        			}
-	        		}).fail(function(){
-                        console.log("problem getting devices");
-                    });
-	        		if (node.device) {
-	        			$('#node-input-device').val(node.device);
-	        		}
+	        		getDevs(account);
         		}
         	}
 
@@ -146,26 +163,27 @@
         		var account = $('#node-input-conf').val();
                 //console.log("account changed: ", account);
                 if (account != '_ADD_') {
-            		$.getJSON('alexa-home/devices/' + account, function(data){
-            			$('#node-input-device').find('option').remove().end();
-            			for (d in data) {
-            				$('<option/>',{
-    							value: parseInt(data[d].applianceId),
-    							text: data[d].friendlyName
-    						}).appendTo('#node-input-device');
-            			}
-            		}).fail(function(){
-                        console.log("problem getting devices");
-                    });
-            		if (node.device) {
-            			$('#node-input-device').val(node.device);
-            		}
+            		getDevs(account);
                 } else {
                     //console.log("new account");
                     $('#node-input-device').find('option').remove().end();
                     $('#node-input-device').val("");
                 }
-        	})
+        	});
+
+            $('#node-input-device-refresh').click(function(){
+                $('#node-input-device-refresh').addClass('disabled');
+                var account = $('#node-input-conf').val();
+                $.ajax({
+                    url: 'alexa-home/refresh/' + account,
+                    type: 'POST'
+                }).done(function(data){
+                    setTimeout(function(){
+                        getDevs(account);
+                        $('#node-input-device-refresh').removeClass('disabled');
+                    },3000);
+                });
+            });
         }
     });
 </script>

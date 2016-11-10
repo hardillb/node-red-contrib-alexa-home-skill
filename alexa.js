@@ -148,11 +148,26 @@ module.exports = function(RED) {
     };
 
     RED.httpAdmin.post('/alexa-home/new-account',function(req,res){
-    	console.log(req.body);
+    	//console.log(req.body);
     	var username = req.body.user;
     	var password = req.body.pass;
     	var id = req.body.id;
     	getDevices(username,password,id);
+    });
+
+    RED.httpAdmin.post('/alexa-home/refresh/:id',function(req,res){
+        var id = req.params.id;
+        var conf = RED.nodes.getNode(id);
+        if (conf) {
+            var username = conf.username;
+            var password = conf.credentials.password;
+            getDevices(username,password,id);
+            res.status(200).send();
+        } else {
+            //not deployed yet
+            console.log("Can't refresh until deployed");
+            res.status(404).send();
+        }
     });
 
     RED.httpAdmin.get('/alexa-home/devices/:id',function(req,res){
