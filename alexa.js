@@ -15,6 +15,7 @@
  **/
 
 module.exports = function(RED) {
+
     "use strict";
     var request = require('request');
     var mqtt = require('mqtt');
@@ -36,7 +37,7 @@ module.exports = function(RED) {
 
         getDevices(node.username, node.password, node.id);
 
-        node.client = mqtt.connect('mqtt://134.168.37.62', options);
+        node.client = mqtt.connect('mqtt://alexa-node-red.hardill.me.uk', options);
 
         node.client.on('connect', function() {
             node.emit('status',{text:'connected', shape:'dot', fill:'green'});
@@ -139,7 +140,8 @@ module.exports = function(RED) {
                     //console.log(devs);
                     devices[id] = devs;
                 } else {
-                    console.log("err: ",err);
+                    //console.("err: " + err);
+                    RED.log.log("Problem looking up " + username + "'s devices");
                 }
             });
         }
