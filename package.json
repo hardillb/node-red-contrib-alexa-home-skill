@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-alexa-home-skill",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,14 @@
     "alexa",
     "echo"
   ],
+  "bugs": {
+    "url" : "https://github.com/hardillb/node-red-contrib-alexa-home-skill/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hardillb/node-red-contrib-alexa-home-skill"
+  },
+  "homepage": "https://alexa-node-red.eu-gb.mybluemix.net",
   "node-red": {
     "nodes": {
       "alexa": "alexa.js"
