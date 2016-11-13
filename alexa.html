@@ -35,7 +35,7 @@
         credentials: {
             password: {type:"password"}
         },
-        color: 'gray',
+        color: '#D3D3D3',
         label: function() {
         	return this.username;
         },
@@ -88,6 +88,8 @@
     You will also need to add the "Node-RED" skill to your Echo device</p>
     <p>A full set of setup instrucations can be found 
     <a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/docs">here</a></p>
+    <p>The <i>Topic</i> field is optional and will be added to any messages sent from 
+    the node.</p>
     <p>The node outputs a message with a payload that looks something like this:</p>
     <pre>{
     "command": "TurnOnRequest",
@@ -123,7 +125,7 @@
         },
         outputs: 1,
         inputs: 0,
-        color: 'gray',
+        color: '#D3D3D3',
         icon: 'alexa.png',
         label: function() {
         	return this.name || "Alexa Home";

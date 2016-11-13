@@ -28,41 +28,94 @@ module.exports = function(RED) {
     	this.username = n.username;
     	this.password = this.credentials.password;
 
+        this.users = {};
+
     	var node = this;
 
         var options = {
             username: node.username,
-            password: node.password
+            password: node.password,
+            servers:[
+                {
+                    protocol: 'mqtts',
+                    host: 'alexa-node-red.hardill.me.uk',
+                    port: 8883
+                },
+                {
+                    protocol: 'mqtt',
+                    host: 'alexa-node-red.hardill.me.uk',
+                    port: 1883
+                }
+            ]
         };
 
         getDevices(node.username, node.password, node.id);
 
-        node.client = mqtt.connect('mqtt://alexa-node-red.hardill.me.uk', options);
+        this.connect = function() {
+            node.client = mqtt.connect('mqtts://alexa-node-red.hardill.me.uk:8883', options);
+            node.client.setMaxListeners(0);
 
-        node.client.on('connect', function() {
-            node.emit('status',{text:'connected', shape:'dot', fill:'green'});
-            node.client.subscribe(node.username + '/#');
-        });
+            node.client.on('connect', function() {
+                node.setStatus({text:'connected', shape:'dot', fill:'green'});
+                node.client.removeAllListeners('message');
+                node.client.subscribe(node.username + '/#');
+                node.client.on('message', function(topic, message){
+                    var msg = JSON.parse(message.toString()); 
+                    for (var id in node.users) {
+                        if (node.users.hasOwnProperty(id)){
+                            node.users[id].command(msg);
+                        }
+                    }
+                });
+            });
 
-        node.client.on('offline',function(){
-            node.emit('status',{text: 'disconnected', shape: 'dot', fill:'red'});
-        });
+            node.client.on('offline',function(){
+                node.setStatus({text: 'disconnected', shape: 'dot', fill:'red'});
+            });
 
-        node.client.on('reconnect', function(){
-            node.emit('status',{text: 'reconnecting', shape: 'ring', fill:'red'});
-        });
+            node.client.on('reconnect', function(){
+                node.setStatus({text: 'reconnecting', shape: 'ring', fill:'red'});
+            });
+        }
 
-        node.client.on('message', function(topic, message){
-            // console.log(topic);
-            // console.log(message.toString());
-            var msg = JSON.parse(message.toString()); 
-            node.emit('alexa'+msg.payload.appliance.applianceId, msg);
-        });
+        this.setStatus = function(status) {
+            for( var id in node.users) {
+                if (node.users.hasOwnProperty(id)) {
+                    node.users[id].status(status);
+                }
+            }
+        }
+
+        this.register = function(deviceNode) {
+            node.users[deviceNode.id] = deviceNode;
+            if (Object.keys(node.users).length === 1) {
+                //connect
+                node.connect();
+            }
+        };
+
+        this.deregister = function(deviceNode, done) {
+            delete node.users[deviceNode.id];
+
+            if (Object.keys(node.users).length === 0) {
+                //disconnect
+                if (node.client && node.client.connected) {
+                    node.client.end(done);
+                } else {
+                    node.client.end();
+                    done();
+                }
+            }
+
+            done();
+        };
 
     	this.on('close',function(){
-            node.client.end();
+            if (node.client && node.client.connected) {
+                node.client.end();
+            }
             //node.removeAllListeners();
-    		delete devices[node.id];
+    		//delete devices[node.id];
     	});
     };
 
@@ -80,7 +133,7 @@ module.exports = function(RED) {
 
     	var node = this;
 
-        function msgHandler(message){
+        node.command = function (message){
             var msg ={
                 topic: node.topic || "",
                 payload: {
@@ -109,14 +162,10 @@ module.exports = function(RED) {
             node.send(msg);
         }
 
-        node.conf.on('alexa'+node.device, msgHandler);
+        node.conf.register(node);
 
-        node.conf.on('status',function(status){
-            node.status(status);
-        });
-
-        node.on('close', function(){
-            node.conf.removeListener(''+node.device,msgHandler);
+        node.on('close', function(done){
+            node.conf.deregister(node, done);
         });
 
     }
@@ -135,7 +184,7 @@ module.exports = function(RED) {
                     password: password
                 }
             }, function(err, res, body){
-                if (!err) {
+                if (!err && res.statusCode == 200) {
                     var devs = JSON.parse(body);
                     //console.log(devs);
                     devices[id] = devs;
