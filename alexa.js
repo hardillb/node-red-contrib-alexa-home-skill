@@ -76,6 +76,11 @@ module.exports = function(RED) {
             node.client.on('reconnect', function(){
                 node.setStatus({text: 'reconnecting', shape: 'ring', fill:'red'});
             });
+
+            node.client.on('error', function (err){
+                //console.log(err);
+                node.setStatus({text: 'disconnected', shape: 'dot', fill:'red'});
+            });
         }
 
         this.setStatus = function(status) {
