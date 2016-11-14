@@ -35,6 +35,7 @@ module.exports = function(RED) {
         var options = {
             username: node.username,
             password: node.password,
+            reconnectPeriod: 5000,
             servers:[
                 {
                     protocol: 'mqtts',
@@ -58,7 +59,7 @@ module.exports = function(RED) {
             node.client.on('connect', function() {
                 node.setStatus({text:'connected', shape:'dot', fill:'green'});
                 node.client.removeAllListeners('message');
-                node.client.subscribe(node.username + '/#');
+                node.client.subscribe("command/" + node.username + '/#');
                 node.client.on('message', function(topic, message){
                     var msg = JSON.parse(message.toString()); 
                     for (var id in node.users) {
