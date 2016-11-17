@@ -75,6 +75,11 @@
         <a id="node-input-device-refresh" class="btn"><i class="fa fa-refresh"></i></a>
 	</div>
     <div class="form-row">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-input-acknoledge" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-acknoledge" style="width: 70%"> Auto Acknoledge</span>
+    </div>
+    <div class="form-row">
         <label for="node-input-topic"><i class="icon-tag"></i> Topic</label>
         <input type="text" id="node-input-topic">
     </div>
@@ -90,6 +95,8 @@
     <a target="_blank" href="https://alexa-node-red.eu-gb.mybluemix.net/docs">here</a></p>
     <p>The <i>Topic</i> field is optional and will be added to any messages sent from 
     the node.</p>
+    <p>Auto Acknoledge tells Alexa the command suceeded no matter what. If you untick 
+    this option you will need to add a <i>Alexa Home Response</i> node to the flow.</p>
     <p>The node outputs a message with a payload that looks something like this:</p>
     <pre>{
     "command": "TurnOnRequest",
@@ -120,6 +127,7 @@
         defaults: {
         	conf: {value: "", type:"alexa-home-conf"},
         	device: {value: "" },
+            acknoledge: {value: true},
         	name: {},
             topic: {}
         },
@@ -135,6 +143,12 @@
         },
         oneditprepare: function(){
         	var node = this;
+
+            console.log("foo");
+            if (typeof node.acknoledge === 'undefined') {
+                console.log("ben");
+                $('#node-input-acknoledge').prop('checked', true);
+            }
 
             var getDevs = function (account){
                 $.getJSON('alexa-home/devices/' + account, function(data){
@@ -186,6 +200,31 @@
                     },3000);
                 });
             });
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="alexa-home-resp">
+</script>
+
+<script type="text/x-red" data-help-name="alexa-home">
+    <p>This node sends a response to Alexa to acknoledge if the command
+    succeeded or not.</p>
+    <p>The message must come from the Alexa Home input node and takes a
+    payload of true/false</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('alexa-home-resp',{
+        category: 'alexa',
+        defaults: {
+        },
+        inputs: 1,
+        outputs: 0,
+        color: '#D3D3D3',
+        icon: 'alexa.png',
+        label: function() {
+            return this.name || "Alexa Home Response";
         }
     });
 </script>
