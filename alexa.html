@@ -97,16 +97,23 @@
     the node.</p>
     <p>Auto Acknoledge tells Alexa the command suceeded no matter what. If you untick 
     this option you will need to add a <i>Alexa Home Response</i> node to the flow.</p>
-    <p>The node outputs a message with a payload that looks something like this:</p>
+    <p>The node outputs a message that looks something like this:</p>
     <pre>{
     "command": "TurnOnRequest",
-    "extraInfo": {}
+    "extraInfo": {},
+    "payload": true
 }</pre>
     <p>or</p>
     <pre>{
     "command": "SetPercentageRequest",
     "extraInfo": {}, 
-    "value": 50
+    "payload": 50
+}</pre>
+    <p>or</p>
+    <pre>{
+    "command": "DecrementTemperatureRequest",
+    "extraInfo": {}, 
+    "payload": -5
 }</pre>
     <p>This is a full list of the currently valid commands:</p>
     <ul>

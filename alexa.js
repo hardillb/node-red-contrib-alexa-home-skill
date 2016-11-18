@@ -98,6 +98,7 @@ module.exports = function(RED) {
             node.client.on('error', function (err){
                 //console.log(err);
                 node.setStatus({text: 'disconnected', shape: 'dot', fill:'red'});
+                node.error(err);
             });
         }
 
@@ -176,26 +177,34 @@ module.exports = function(RED) {
                 _messageId: message.header.messageId,
                 _applianceId: message.payload.appliance.applianceId,
                 _confId: node.confId,
-                payload: {
-                    command: message.header.name,
-                    extraInfo: message.payload.appliance.additionalApplianceDetails
-                }
+                command: message.header.name,
+                extraInfo: message.payload.appliance.additionalApplianceDetails
             }
 
             switch(message.header.name){
+                case "TurnOnRequest":
+                    msg.payload = true;
+                    break;
+                case "TurnOffRequest":
+                    msg.payload = false;
+                    break;
                 case "SetPercentageRequest":
-                    msg.payload.value = message.payload.percentageState;
+                    msg.payload = message.payload.percentageState;
                     break;
                 case "IncrementPercentageRequest":
+                    msg.payload = message.payload.deltaPercentage.value;
+                    break;
                 case "DecrementPercentageRequest":
-                    msg.payload.value = message.payload.deltaPercentage.value;
+                    msg.payload = -1 * message.payload.deltaPercentage.value;
                     break;
                 case "SetTargetTemperatureRequest":
-                    msg.payload.value = message.payload.targetTemperature.value;
+                    msg.payload = message.payload.targetTemperature.value;
                     break;
                 case "IncrementTargetTemperatureRequest":
+                    msg.payload = message.payload.deltaTemperature.value;
+                    break;
                 case "DecrementTargetTemperatureRequest":
-                    msg.payload.value = message.payload.deltaTemperature.value;
+                    msg.payload = -1 * message.payload.deltaTemperature.value;
                     break;
             }
 
