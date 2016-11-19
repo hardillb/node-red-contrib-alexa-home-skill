@@ -147,6 +147,8 @@ module.exports = function(RED) {
                 response.extra = extra;
             }
 
+            // console.log("response: " + response);
+
             var topic = 'response/' + node.username + '/' + device;
             if (node.client && node.client.connected) {
                 node.client.publish(topic, JSON.stringify(response));
@@ -208,20 +210,27 @@ module.exports = function(RED) {
                     break;
                 case "SetTargetTemperatureRequest":
                     msg.payload = message.payload.targetTemperature.value;
-                    respose = {
+                    response = {
                         targetTemperature: {
                             value: message.payload.targetTemperature.value
-                        },
-                        temperatureMode: {
-                            value: 'AUTO'
-                        } 
+                        }
                     };
                     break;
                 case "IncrementTargetTemperatureRequest":
                     msg.payload = message.payload.deltaTemperature.value;
+                    response = {
+                        targetTemperature: {
+                            value: message.payload.targetTemperature.value
+                        }
+                    };
                     break;
                 case "DecrementTargetTemperatureRequest":
                     msg.payload = -1 * message.payload.deltaTemperature.value;
+                    response = {
+                        targetTemperature: {
+                            value: message.payload.targetTemperature.value
+                        }
+                    };
                     break;
             }
 
@@ -253,13 +262,7 @@ module.exports = function(RED) {
                 if (typeof msg.payload == 'boolean' && msg.payload) {
                     conf.acknoledge(msg._messageId, msg._applianceId, true, msg.extra);
                 } else {
-                    if (typeof msg.payload === 'boolean') {
-                        conf.acknoledge(msg._messageId, msg._applianceId, false);
-                    } else if (typeof msg.payload === 'object') {
-                        if (message.payload.hasOwnProperty(min)) {
-                            cong.acknoledge(msg._messageId, msg._applianceId, false, message.payload);
-                        }
-                    }
+                    conf.acknoledge(msg._messageId, msg._applianceId, false, msg.extra);
                 }
             }
 
