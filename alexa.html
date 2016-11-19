@@ -149,9 +149,9 @@
             this.name = $('#node-input-device option:selected').text();
         },
         oneditprepare: function(){
-        	var node = this;
+            var node = this;
 
-            console.log("foo");
+            console.log("foo " + node.device);
             if (typeof node.acknoledge === 'undefined') {
                 console.log("ben");
                 $('#node-input-acknoledge').prop('checked', true);
@@ -166,12 +166,13 @@
                             text: data[d].friendlyName
                         }).appendTo('#node-input-device');
                     }
+                    if (node.device) {
+                        $('#node-input-device').val(node.device);
+                    }
                 }).fail(function(){
                     console.log("problem getting devices");
                 });
-                if (node.device) {
-                    $('#node-input-device').val(node.device);
-                }
+                
             }
 
         	if (node.conf) {

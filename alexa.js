@@ -78,10 +78,13 @@ module.exports = function(RED) {
                 node.client.removeAllListeners('message');
                 node.client.subscribe("command/" + node.username + "/#");
                 node.client.on('message', function(topic, message){
-                    var msg = JSON.parse(message.toString()); 
+                    var msg = JSON.parse(message.toString());
+                    var applianceId = msg.payload.appliance.applianceId;
                     for (var id in node.users) {
                         if (node.users.hasOwnProperty(id)){
-                            node.users[id].command(msg);
+                            if (node.users[id].device === applianceId) {
+                                node.users[id].command(msg);
+                            }
                         }
                     }
                 });
@@ -237,7 +240,7 @@ module.exports = function(RED) {
         node.on('input',function(msg){
             if (msg._messageId && msg._applianceId && msg._confId) {
                 var conf = RED.nodes.getNode(msg._confId);
-                if (typeof msg.payload == boolean && msg.payload) {
+                if (typeof msg.payload == 'boolean' && msg.payload) {
                     conf.acknoledge(msg._messageId, msg._applianceId, true);
                 } else {
                     if (typeof msg.payload === 'boolean') {
