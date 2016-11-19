@@ -216,9 +216,17 @@
 
 <script type="text/x-red" data-help-name="alexa-home">
     <p>This node sends a response to Alexa to acknoledge if the command
-    succeeded or not.</p>
+    succeeded or not. Responses must be sent with in 5 seconds of 
+    receiving the request other wise a timeout message will be returned
+    to the Alexa sevice.</p>
     <p>The message must come from the Alexa Home input node and takes a
-    payload of true/false</p>
+    payload of true/false for on/off requests. For percentage or 
+    temperature requests the payload can also be an object with 
+    the min and max accepted values for the accepted range. e.g.</p>
+    <pre>{
+    min: 10.0,
+    max: 30.0
+}</pre>
 </script>
 
 <script type="text/javascript">

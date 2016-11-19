@@ -134,11 +134,15 @@ module.exports = function(RED) {
             done();
         };
 
-        this.acknoledge = function(messageId, device, success) {
+        this.acknoledge = function(messageId, device, success, range) {
             var response = {
                 messageId: messageId,
                 success: success
             };
+
+            if (!success && range) {
+                response.range = range;
+            }
 
             var topic = 'response/' + node.username + '/' + device;
             if (node.client && node.client.connected) {
@@ -233,10 +237,16 @@ module.exports = function(RED) {
         node.on('input',function(msg){
             if (msg._messageId && msg._applianceId && msg._confId) {
                 var conf = RED.nodes.getNode(msg._confId);
-                if (msg.payload) {
+                if (typeof msg.payload == boolean && msg.payload) {
                     conf.acknoledge(msg._messageId, msg._applianceId, true);
                 } else {
-                    conf.acknoledge(msg._messageId, msg._applianceId, false);
+                    if (typeof msg.payload === 'boolean') {
+                        conf.acknoledge(msg._messageId, msg._applianceId, false);
+                    } else if (typeof msg.payload === 'object') {
+                        if (message.payload.hasOwnProperty(min)) {
+                            cong.acknoledge(msg._messageId, msg._applianceId, false, message.payload);
+                        }
+                    }
                 }
             }
 
