@@ -137,14 +137,14 @@ module.exports = function(RED) {
             done();
         };
 
-        this.acknoledge = function(messageId, device, success, range) {
+        this.acknoledge = function(messageId, device, success, extra) {
             var response = {
                 messageId: messageId,
                 success: success
             };
 
-            if (!success && range) {
-                response.range = range;
+            if (extra) {
+                response.extra = extra;
             }
 
             var topic = 'response/' + node.username + '/' + device;
@@ -188,6 +188,8 @@ module.exports = function(RED) {
                 extraInfo: message.payload.appliance.additionalApplianceDetails
             }
 
+            var response;
+
             switch(message.header.name){
                 case "TurnOnRequest":
                     msg.payload = true;
@@ -206,6 +208,14 @@ module.exports = function(RED) {
                     break;
                 case "SetTargetTemperatureRequest":
                     msg.payload = message.payload.targetTemperature.value;
+                    respose = {
+                        targetTemperature: {
+                            value: message.payload.targetTemperature.value
+                        },
+                        temperatureMode: {
+                            value: 'AUTO'
+                        } 
+                    };
                     break;
                 case "IncrementTargetTemperatureRequest":
                     msg.payload = message.payload.deltaTemperature.value;
@@ -217,7 +227,7 @@ module.exports = function(RED) {
 
             node.send(msg);
             if (node.acknoledge) {
-                node.conf.acknoledge(message.header.messageId, node.device, true);
+                node.conf.acknoledge(message.header.messageId, node.device, true, response);
             }
         }
 
@@ -241,7 +251,7 @@ module.exports = function(RED) {
             if (msg._messageId && msg._applianceId && msg._confId) {
                 var conf = RED.nodes.getNode(msg._confId);
                 if (typeof msg.payload == 'boolean' && msg.payload) {
-                    conf.acknoledge(msg._messageId, msg._applianceId, true);
+                    conf.acknoledge(msg._messageId, msg._applianceId, true, msg.extra);
                 } else {
                     if (typeof msg.payload === 'boolean') {
                         conf.acknoledge(msg._messageId, msg._applianceId, false);
