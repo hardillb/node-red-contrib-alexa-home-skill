@@ -21,7 +21,7 @@ module.exports = function(RED) {
     var mqtt = require('mqtt');
     var bodyParser = require('body-parser');
 
-    var devicesURL = 'https://alexa-node-red.eu-gb.mybluemix.net/api/v1/devices';
+    var devicesURL = 'https://alexa-node-red.bm.hardill.me.uk/api/v1/devices';
 
 
     var devices = {};
