@@ -190,7 +190,8 @@ module.exports = function(RED) {
                 extraInfo: message.payload.appliance.additionalApplianceDetails
             }
 
-            var response;
+            var responseExtra;
+            var respond = true;
 
             switch(message.header.name){
                 case "TurnOnRequest":
@@ -210,7 +211,7 @@ module.exports = function(RED) {
                     break;
                 case "SetTargetTemperatureRequest":
                     msg.payload = message.payload.targetTemperature.value;
-                    response = {
+                    responseExtra = {
                         targetTemperature: {
                             value: message.payload.targetTemperature.value
                         }
@@ -218,7 +219,7 @@ module.exports = function(RED) {
                     break;
                 case "IncrementTargetTemperatureRequest":
                     msg.payload = message.payload.deltaTemperature.value;
-                    response = {
+                    responseExtra = {
                         targetTemperature: {
                             value: message.payload.targetTemperature.value
                         }
@@ -226,17 +227,28 @@ module.exports = function(RED) {
                     break;
                 case "DecrementTargetTemperatureRequest":
                     msg.payload = -1 * message.payload.deltaTemperature.value;
-                    response = {
+                    responseExtra = {
                         targetTemperature: {
                             value: message.payload.targetTemperature.value
                         }
                     };
                     break;
+                case "SetLockStateRequest":
+                    msg.payload = message.payload.lockState;
+                    responseExtra = {
+                        lockState: message.payload.lockState
+                    }
+                    break;
+                case "GetLockStateRequest":
+                case "GetTemperatureReadingRequest":
+                case "GetTargetTemperatureRequest":
+                    respond = false;
+                    break;
             }
 
             node.send(msg);
-            if (node.acknoledge) {
-                node.conf.acknoledge(message.header.messageId, node.device, true, response);
+            if (node.acknoledge && respond) {
+                node.conf.acknoledge(message.header.messageId, node.device, true, responseExtra);
             }
         }
 
