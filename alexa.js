@@ -54,18 +54,18 @@ module.exports = function(RED) {
             ]
         };
 
-        if (process.env.DEBUG) {
-            console.log("debug");
-            process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-            var test = {
-                protocol: 'mqtt',
-                host: '172.17.0.2',
-                port: 1883
-            };
-            options.servers = [test];
+        // if (process.env.DEBUG) {
+        //     console.log("debug");
+        //     process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+        //     var test = {
+        //         protocol: 'mqtt',
+        //         host: '172.17.0.2',
+        //         port: 1883
+        //     };
+        //     options.servers = [test];
 
-            devicesURL = 'https://localhost:3000/api/v1/devices'
-        }
+        //     devicesURL = 'https://localhost:3000/api/v1/devices'
+        // }
 
         getDevices(node.username, node.password, node.id);
 
@@ -177,12 +177,14 @@ module.exports = function(RED) {
     	this.device = n.device;
         this.topic = n.topic;
         this.acknoledge = n.acknoledge;
+        this.name = n.name;
 
     	var node = this;
 
         node.command = function (message){
             var msg ={
                 topic: node.topic || "",
+                name: node.name,
                 _messageId: message.header.messageId,
                 _applianceId: message.payload.appliance.applianceId,
                 _confId: node.confId,
