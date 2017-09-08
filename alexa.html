@@ -170,7 +170,7 @@
         oneditprepare: function(){
             var node = this;
 
-            console.log("foo " + node.device);
+            //console.log("foo " + node.device);
             if (typeof node.acknoledge === 'undefined') {
                 console.log("ben");
                 $('#node-input-acknoledge').prop('checked', true);
@@ -192,8 +192,9 @@
                     if (node.device) {
                         $('#node-input-device').val(node.device);
                     }
-                }).fail(function(){
+                }).fail(function(jqXHR, textStatus, errorThrown){
                     console.log("problem getting devices");
+                    console.log(textStatus);
                 });
                 
             }

@@ -203,7 +203,7 @@ module.exports = function(RED) {
                     msg.payload = false;
                     break;
                 case "SetPercentageRequest":
-                    msg.payload = message.payload.percentageState;
+                    msg.payload = message.payload.percentageState.value;
                     break;
                 case "IncrementPercentageRequest":
                     msg.payload = message.payload.deltaPercentage.value;
@@ -240,6 +240,27 @@ module.exports = function(RED) {
                     responseExtra = {
                         lockState: message.payload.lockState
                     }
+                    break;
+                case "SetColorRequest":
+                    msg.payload = message.payload.color;
+                    responseExtra = {
+                        achievedState: message.payload
+                    };
+                    break;
+                case "SetColorTemperatureRequest":
+                    msg.payload = message.payload.colorTemperature.value;
+                    responseExtra = {
+                        achievedState: message.payload
+                    }
+                    //respond = false;
+                    break;
+                case "IncrementColorTemperatureRequest":
+                    msg.payload = message.payload
+                    respond = false;
+                    break;
+                case "decrementColorTemperatureRequest":
+                    msg.payload = message.payload;
+                    respond = false;
                     break;
                 case "GetLockStateRequest":
                 case "GetTemperatureReadingRequest":
