@@ -244,7 +244,9 @@ module.exports = function(RED) {
                 case "SetColorRequest":
                     msg.payload = message.payload.color;
                     responseExtra = {
-                        achievedState: message.payload
+                        achievedState: {
+                            color: message.payload.color
+                        }
                     };
                     break;
                 case "SetColorTemperatureRequest":
