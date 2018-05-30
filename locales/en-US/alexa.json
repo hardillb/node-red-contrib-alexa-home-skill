@@ -1,0 +1,12 @@
+{
+	"alexa":{
+		"label": {
+			"connected": "connected",
+			"disconnected": "disconnected",
+			"reconnecting": "reconnecting"
+		},
+		"errors": {
+
+		}
+	}
+}
