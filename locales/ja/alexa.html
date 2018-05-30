@@ -1,0 +1,70 @@
+<script type="text/x-red" data-help-name="alexa-home">
+    <p>このノードは、Alexa Homeスキルのエンドポイントを提供します。</p>
+    <p>このノードを使用するには、<a target="_blank" href="https://alexa-node-red.bm.hardill.me.uk/">こちら</a>でアカウントを作成して、いくつかのデバイスを宣言する必要があります。</p>
+    <p>セットアップの詳細は、<a target="_blank" href="https://alexa-node-red.bm.hardill.me.uk/docs">こちら</a>を参照ください。</p>
+    <h3>入力</h3>
+    <dl class="message-properties">
+        <dt class="optional">account</dt>
+        <dd>事前に作成したアカウントとパスワードを入力ください。</dd>
+        <dt class="optional">device
+            <span class="property-type">string</span>
+        </dt>
+        <dd>事前に用意したデバイスを選択してください。アカウントが正しく入力されていれば、選択できるようになります。</dd>
+        <dt class="optional">Auto Acknoledge</dt>
+        <dd>有効の場合は、Alexaに何があってもコマンドが成功したと伝えます。このオプションを無効にした場合は、フローに<i>Alexa Home Response</i>ノードを追加する必要があります。</dd>
+    <h3>出力</h3>
+    <p>次のようなメッセージを出力します。</p>
+    <pre>{
+    "command": "TurnOnRequest",
+    "extraInfo": {},
+    "payload": true
+}</pre>
+    <p>or</p>
+    <pre>{
+    "command": "SetPercentageRequest",
+    "extraInfo": {},
+    "payload": 50
+}</pre>
+    <p>or</p>
+    <pre>{
+    "command": "DecrementTemperatureRequest",
+    "extraInfo": {},
+    "payload": -5
+}</pre>
+<p>or</p>
+    <pre>{
+    "command": "SetLockState",
+    "extraInfo": {},
+    "payload": 'LOCKED'
+}</pre>
+    <h3>詳細</h3>
+    <p>下記が、現在有効なコマンドの完全なリストです。</p>
+    <ul>
+        <li>TurnOnRequest</li>
+        <li>TurnOffRequest</li>
+        <li>SetPercentageRequest</li>
+        <li>IncrementPercentageRequest</li>
+        <li>DecrementPercentageRequest</li>
+        <li>SetTemperatureRequest</li>
+        <li>IncrementTemperatureRequest</li>
+        <li>DecrementTemperatureRequest</li>
+        <li>GetTemperatureReadingRequest <sup>1,2</sup></li>
+        <li>GetTemperatureRequest <sup>1,2</sup></li>
+        <li>SetLockState <sup>2</sup></li>
+        <li>GetLockState <sup>1,2</sup></li>
+    </ul>
+    <ol>
+        <li>これらのアクションは、値を返さなければならないので、自動的には認められません。</li>
+        <li>現在のところ、米国のユーザーのみが利用できます。</li>
+    </ol>
+</script>
+
+<script type="text/x-red" data-help-name="alexa-home-resp">
+    <p>このノードは、Alexa Home へ返答するノードになります。</p>
+    <h3>入力</h3>
+    <dl class="message-properties">
+        <dt class="optional">pyaload
+            <span class="property-type">boolean</span>
+        </dt>
+        <dd>アクションが成功したと返答する場合は<code>true</code>、失敗の場合は<code>false</code>を設定してください。<dd>
+</script>
