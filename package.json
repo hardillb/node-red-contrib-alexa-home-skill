@@ -13,7 +13,7 @@
     "skill"
   ],
   "bugs": {
-    "url" : "https://github.com/hardillb/node-red-contrib-alexa-home-skill/issues"
+    "url": "https://github.com/hardillb/node-red-contrib-alexa-home-skill/issues"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "body-parser": "^1.15.2",
-    "mqtt": "^2.0.1",
+    "mqtt": "^4.2.6",
     "request": "^2.78.0"
   }
 }
