@@ -41,11 +41,11 @@ module.exports = function(RED) {
             clientId: node.username,
             reconnectPeriod: 5000,
             servers:[
-                {
-                    protocol: 'mqtts',
-                    host: 'alexa-node-red.hardill.me.uk',
-                    port: 8883
-                },
+                // {
+                //     protocol: 'mqtts',
+                //     host: 'alexa-node-red.hardill.me.uk',
+                //     port: 8883
+                // },
                 {
                     protocol: 'mqtt',
                     host: 'alexa-node-red.hardill.me.uk',
