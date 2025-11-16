@@ -223,7 +223,7 @@ module.exports = function(RED) {
                     msg.payload = message.payload.deltaTemperature.value;
                     responseExtra = {
                         targetTemperature: {
-                            value: message.payload.targetTemperature.value
+                            value: 0
                         }
                     };
                     break;
@@ -231,7 +231,7 @@ module.exports = function(RED) {
                     msg.payload = -1 * message.payload.deltaTemperature.value;
                     responseExtra = {
                         targetTemperature: {
-                            value: message.payload.targetTemperature.value
+                            value: 0
                         }
                     };
                     break;
